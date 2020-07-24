@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+<h1>Transaction History <img src="/static/generic.png" alt="Generic Coin Pic" width="100" height="100"></h1><br></br>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">ID</th><th scope="col">Symbol</th><th scope="col">Transaction</th>
+            <th scope="col">Price (USD)</th><th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for row in rows %}
+            <tr>
+                <td>{{ row["id"] }}</td><td>{{ row["symbol"] }}</td><td>{{ row["trans"] }}</td>
+                <td>{{ row["price"]|usd }}</td><td>{{ row["displaydate"] }}</td>
+            </tr>
+        {% endfor %}
+
+    </tbody>
+</table>
+
+{% endblock %}

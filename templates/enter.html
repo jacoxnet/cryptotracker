@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Enter Transaction
+{% endblock %}
+
+{% block main %}
+
+    <h1>Enter Transaction <img src="/static/generic.png" alt="Generic Coin Pic" width="100" height="100" id="coinlogo"></h1>
+    <br></br>
+    <form action="/enter" method="post">
+
+        <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input radioleft" id="buyradio" name="buysellradio" value="buyradio" checked>
+            <label class="custom-control-label radioleft" for="buyradio">Purchase Transaction</label>
+        </div>
+
+        <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input" id="sellradio" name="buysellradio" value="sellradio">
+            <label class="custom-control-label" for="sellradio">Sale transaction</label>
+        </div>
+
+
+        <br></br>
+        <div class="form-group block" id="buyblock">
+            <label for="symbol" class="inputright">Coin symbol </label>
+            <input autocomplete="off" autofocus class="form-control" name="symbol"
+                type="text" id="symbol">
+        </div>
+        <div class="form-group block hide" id="sellblock">
+            <label for="ssymbol" class="inputright">Sell Currency</label>
+            <select autofocus class="mb-3 w-25 custom-select" id="ssymbol" name="ssymbol">
+                <option selected disabled>Select ...</option>
+
+                    {% for currency in currencies %}
+
+                        {% if currency["squantity"] > 0 %}
+
+                            <option value={{ currency["symbol"] }}>{{ currency["symbol"]  }} ({{ currency["squantity"] }} available)</option>
+
+                        {% endif %}
+
+                    {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group" "block">
+            <label for="name" class="inputright">Coin name </label>
+            <input autocomplete="off" class="form-control" placeholder="" readonly name="name"
+                type="text" id="name">
+        </div>
+        <div class="form-group">
+            <label for="price" class="inputright">Price per coin (USD) </label>
+            <input autocomplete="off" required type="number" class="form-control" name="price"
+                 step="0.01" min="0" disabled id="price">
+        </div>
+        <div class="form-group">
+            <label for="quantity" class="inputright">Quantity </label>
+            <input autocomplete="off" required type="number" class="form-control" name="quantity"
+                 step="any" min="0" disabled id="quantity">
+        </div>
+        <div class="form-group">
+            <label for="costs" class="inputright">Add'l expenses (USD) </label>
+            <input autocomplete="off" type="number" class="form-control" name="costs"
+                 step="0.01" min="0" disabled id="costs">
+        <br></br>
+        <div class="form-group" "block">
+            <label for="date" class="inputright">Transaction date </label>
+            <input autocomplete="off" required type="date" name="date" min="2001-01-01"
+                 max="2020-12-31" disabled id="date">
+        </div>
+        <button class="btn btn-primary" type="submit" id="submit">Enter</button>
+    </form>
+
+    <script>
+        function getajaxdata(s) {
+            $.ajax({
+                data: {
+                    symbol: s
+                    },
+                    type: 'POST',
+                    url: '/process'
+                })
+            .done(function(data) {
+                if (data.error) {
+                    $('#name').prop('placeholder', data.error).show();
+                    $('#price').prop('disabled', true);
+                    $('#quantity').prop('disabled', true);
+                    $('#costs').prop('disabled', true);
+                    $('#date').prop('disabled', true);
+                    $('#submit').prop('disabled', true);
+                    $('#coinlogo').attr('src', '/static/generic.png').show();
+                }
+                else {
+                    $('#name').prop('placeholder', data.name).show();
+                    $('#submit').prop('disabled', false);
+                    $('#price').prop('disabled', false);
+                    $('#quantity').prop('disabled', false);
+                    $('#costs').prop('disabled', false);
+                    $('#date').prop('disabled', false);
+                    $('#coinlogo').attr('src', data.logo).show();
+
+                }
+            });
+        }
+
+
+        $(document).ready(function() {
+            $('#symbol').change(function() {
+                let s = $('#symbol').val();
+                getajaxdata(s);
+            });
+
+            $('#ssymbol').change(function() {
+                let s = $('#ssymbol').val()
+                getajaxdata(s);
+            });
+
+           $("input[name=buysellradio]").click(function() {
+                if ($(this).val() == "sellradio") {
+                    $('#buyblock').addClass('hide').hide();
+                    $('#sellblock').removeClass('hide').show();
+                }
+                else {
+                    $('#sellblock').addClass('hide').hide();
+                    $('#buyblock').removeClass('hide').show();
+                }
+                $('#symbol').val('');
+                $('#ssymbol').val('');
+                getajaxdata(''); /* clear coin name & reset other fields */
+            });
+
+        });
+
+    </script>
+
+{% endblock %}

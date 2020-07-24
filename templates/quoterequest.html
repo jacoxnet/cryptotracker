@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    QuoteRequest
+{% endblock %}
+
+{% block main %}
+<h1>Request Quote <img src="/static/generic.png" alt="Generic Coin Pic" width="100" height="100" id="coinlogo"></h1>
+    <br></br>
+
+    <h4>Select a coin you've already bought or sold</h4>
+        <div class="contain">
+            <div class="category">
+                {% for currency in currencies %}
+                    <img src={{ currency["logo"] }} id={{ currency["symbol"] }} alt={{ currency["name"] }}
+                        title={{ currency["name"] }} width="50" height="50">
+                {% endfor %}
+            </div>
+        </div>
+
+    <h4>Or type in a new symbol</h4>
+        <form action="/enter" method="post">
+            <div class="form-group block" id="buyblock">
+                <label for="symbol" class="inputright">Coin symbol </label>
+                <input autocomplete="off" autofocus class="form-control" name="symbol" type="text" id="symbol" placeholder="symbol">
+            </div>
+            <button class="btn btn-primary" type="submit" id="submit" onclick="fetchquote(); return false;">Enter</button>
+        </form>
+    <br></br>
+
+
+
+    <div id="dinfo" class="hide">
+        <h5>
+            <table class="table table-striped" style="max-width: 50%; margin-left:auto;margin-right:auto">
+                <tbody>
+                    <tr>
+                        <td>Currency Name</td><td><div id="dname">Bitcoin</div></td>
+                    </tr>
+                    <tr>
+                        <td>Price</td><td><div id="dprice">$100,000</div></td>
+                    </tr>
+                    <tr>
+                        <td>Market capitalization</td><td><div id="dcap">$1,000,000</div></td>
+                    </tr>
+                    <tr>
+                        <td>24-hour trading volume</td><td><div id="dvol">$1,000,000</div></td>
+                    </tr>
+                    <tr>
+
+                    </tr>
+                </tbody>
+            </table>
+        </h5>
+            <h6><div id="ddesc">Bitcoin is a cryptocurrency.</div></h6>
+    </div>
+
+
+
+<script>
+    function fetchquote() {
+        $.ajax({
+            data: {
+                symbol: $('#symbol').val()
+            },
+            type: 'POST',
+            url: '/process'
+        })
+        .done(function(data) {
+            if (data.error) {
+                $('#symbol').val('');
+                $('#symbol').prop('placeholder', data.error).show();
+                $('#dinfo').addClass('hide').hide();
+                $('#coinlogo').attr('src', '/static/generic.png').show();
+            }
+            else {
+                $('#dinfo').removeClass('hide').show();
+                $('#coinlogo').attr('src', data.logo).show();
+                $('#dname').html(data.name);
+                $('#dprice').html(data.price);
+                $('#dcap').html(data.cap);
+                $('#dvol').html(data.vol);
+                $('#ddesc').html(data.desc);
+
+            }
+        });
+    }
+
+
+    $(document).ready(function() {
+         $('img').bind('click', function (evt) {
+            $('#symbol').val($(this).prop('id'))
+         });
+    })
+
+</script>
+
+
+
+{% endblock %}

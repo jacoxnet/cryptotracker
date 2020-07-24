@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    DisplayHoldings
+{% endblock %}
+
+{% block main %}
+<h1>Current Holdings <img src="/static/generic.png" alt="Generic Coin Pic" width="100" height="100"></h1>
+<br></br>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+		    <table class="table table-image">
+		        <thead>
+        		    <tr>
+        		      <th scope="col" colspan="2">Symbol</th>
+        		      <th scope="col">Currency Name</th>
+        		      <th scope="col">Quantity</th>
+        		      <th scope="col">Current Price</th>
+        		      <th scope="col">Cost Per Coin</th>
+        		      <th scope="col">Unrealized Profit/Loss</th>
+        	          <th scope="col">Current Value</th>
+        		    </tr>
+		        </thead>
+    		    <tbody>
+    		        {% for row in rows %}
+                        {% if row["squantity"] > 0 %}
+                            <tr>
+                                <td><img src={{ row["logo"] }} alt="Coin Pic" width="50" height="50"></td>
+                                <td>{{ row["symbol"] }}</td>
+                                <td align="left">{{ row["name"] }}</td>
+                                <td>{{ row["squantity"] }}</td>
+                                <td>{{ row["curprice"]|usd }}</td>
+                                <td>{{ row["percoin"]|usd }}</td>
+                                <td>{{ row["profit"]|usd }}</td>
+                                <td>{{ row["curvalue"]|usd }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td colspan="6">TOTAL</td>
+                        <td>{{ totalprofit|usd }}</td>
+                        <td>{{ totalvalue|usd }}</td>
+                    </tr>
+                </tbody>
+		    </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
